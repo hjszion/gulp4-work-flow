@@ -1,12 +1,23 @@
-var c ; 
-c = 10;
-c+=9;
+var f
+
+var c = 10;
+c = 9;
+
+console.log(c);
 
 var k = 'abc';
 
 var d = k + 'bbbb';
 
-// let a = b => b + 10;
+console.log(d);
+
+let a = b => b + 10;
+
+function abc(params){
+    console.log(k, params);
+}
+
+abc();
 
 console.log(a(20));
 
