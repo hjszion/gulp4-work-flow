@@ -147,6 +147,8 @@ function devServer(cb) {
         livereload: true,
         middleware: function (connect, opt) {
             return [modRewrite([// 设置代理
+                // http://localhost:38900/api/userlist  该地址被转为下面的地址
+                // http://localhost:4000/userlist
                 '^/api/(.*)$ http://localhost:4000/$1 [P]'])];
         },
     });
