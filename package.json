@@ -11,10 +11,12 @@
   "license": "ISC",
   "devDependencies": {
     "autoprefixer": "^9.6.1",
+    "eslint": "^6.4.0",
     "gulp": "^4.0.2",
     "gulp-clean": "^0.4.0",
     "gulp-clean-css": "^4.2.0",
     "gulp-concat": "^2.6.1",
+    "gulp-eslint": "^6.0.0",
     "gulp-htmlmin": "^5.0.1",
     "gulp-imagemin": "^6.1.0",
     "gulp-rev": "^9.0.0",

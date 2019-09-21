@@ -9,10 +9,7 @@ const revCollector = require('gulp-rev-collector');
 const clean = require('gulp-clean');
 const htmlmin = require('gulp-htmlmin');
 const imagemin = require('gulp-imagemin');
-
-//3.9.1版本
-//第一个参数 任务的名字 第二个参数具体要执行的任务
-gulp.task('default', gulp.series(imgMin));
+const eslint = require('gulp-eslint');
 
 //gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字 
 function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成
@@ -101,7 +98,7 @@ function copy() {
 
 //图片进行压缩处理
 function imgMin() {
-    return gulp.src(['./src/assets/**/*.{jpeg,png,jpg,gif,ico,svg}'], {base:'./src/assets/'})
+    return gulp.src(['./src/assets/**/*.{jpeg,png,jpg,gif,ico,svg}'], { base: './src/assets/' })
         .pipe(imagemin({
             optimizationLevel: 5, // 类型：Number  默认：3  取值范围：0-7（优化等级）
             progressive: true, // 类型：Boolean 默认：false 无损压缩jpg图片
@@ -112,14 +109,35 @@ function imgMin() {
         }))
         .pipe(gulp.dest('./dist/assets/'));
 }
+//js 任务方法
+//1.保证js开发的格式的规范性 eslint => 进行代码格式规范校验(es6 js jsx),还可以辅助我们进行格式化
+//2.es6的转码成es5 => babel 来实现
+//3.对js代码进行压缩处理
+//4.对压缩后的js代码打上版本号
+function js() {
+    return gulp.src(['./src/js/**/*.js'])
+        .pipe(eslint())
+        .pipe(eslint.results(results => {
+            // Called once for all ESLint results.
+            console.log(`JStotalFilesNumber: ${results.length}`);
+            console.log(`JSwarningNumber：: ${results.warningCount}`);
+            console.log(`JSfailNumber: ${results.errorCount}`);
+        }))
+        .pipe(eslint.format())
+        .pipe(eslint.failAfterError());
+}
 
 //开发相关的任务
 //1.监听sass的变化 自动编译sass
 //2.自动执行打开浏览器 启动server
-//3.监听其他文件的变化也是这种方法
+//3.监听js的变化
+
+//dev 任务
 gulp.task('dev', function () {
     gulp.watch(['./src/style/scss/**/*.scss', './src/style/css/**/*.css'], gulp.series(style))
-})
+});
 
-
+//default 任务
+//第一个参数 任务的名字 第二个参数具体要执行的任务
+gulp.task('default', gulp.series(js));
 
