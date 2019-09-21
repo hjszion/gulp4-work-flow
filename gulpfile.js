@@ -17,21 +17,23 @@ const modRewrite = require('connect-modrewrite');
 const open = require('gulp-open');
 const configRevReplace = require('gulp-requirejs-rev-replace');
 
-//gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字 
-function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成
-    //把src目录下的html都复制到dist目录下 并且替换css版本 js版本也得替换
-    //最后 html 进行压缩
+console.log('env:', process.env.xx);
+
+//gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字   
+function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成   
+    //把src目录下的html都复制到dist目录下 并且替换css版本 js版本也得替换   
+    //最后 html 进行压缩   
     return gulp.src(['./src/index.html', './src/view/**/*.html', './src/style/rev-manifest.json', './src/js/rev-manifest.json'], { base: './src/' })
-        .pipe(revCollector({ replaceReved: true }))   //对这些文件进行打版本
-        .pipe(htmlmin({
-            removeComments: true, // 清除HTML注释
-            collapseWhitespace: true, // 压缩HTML
-            // collapseBooleanAttributes: true, //省略布尔属性的值 <input checked="true"/> ==> <input />
-            removeEmptyAttributes: true, // 删除所有空格作属性值 <input id="" /> ==> <input />
-            removeScriptTypeAttributes: true, // 删除<script>的type="text/javascript"
-            removeStyleLinkTypeAttributes: true, // 删除<style>和<link>的type="text/css"
-            minifyJS: true, // 压缩页面JS
-            minifyCSS: true // 压缩页面CSS
+        .pipe(revCollector({ replaceReved: true }))   //对这些文件进行打版本   
+        .pipe(htmlmin({   
+            removeComments: true, // 清除HTML注释   
+            collapseWhitespace: true, // 压缩HTML   
+            // collapseBooleanAttributes: true, //省略布尔属性的值 <input checked="true"/> ==> <input />   
+            removeEmptyAttributes: true, // 删除所有空格作属性值 <input id="" /> ==> <input />   
+            removeScriptTypeAttributes: true, // 删除<script>的type="text/javascript"   
+            removeStyleLinkTypeAttributes: true, // 删除<style>和<link>的type="text/css"   
+            minifyJS: true, // 压缩页面JS   
+            minifyCSS: true // 压缩页面CSS   
         })) //压缩html   
         .pipe(gulp.dest('./dist/'))  //目标目录和源目录对应  ./dist/ => ./src/
 }
@@ -151,6 +153,7 @@ function revjs() {
 }
 
 //使用gulp-connect配置服务器
+//#region 开发测试服务器
 // 配置测试服务器
 function devServer(cb) {
     connect.server({
@@ -173,6 +176,31 @@ function openBrowser() {
         .src(__filename)
         .pipe(open({ uri: 'http://localhost:38900/index.html' }));
 }
+//#endregion 开发测试服务器
+
+//#region 生产测试服务器
+function devServer(cb) {
+    connect.server({
+        root: ['./dist'], // 网站根目录
+        port: 38901, // 端口
+        livereload: true,
+        middleware: function (connect, opt) {
+            return [modRewrite([// 设置代理
+                // http://localhost:38900/api/userlist  该地址被转为下面的地址
+                // http://localhost:4000/userlist
+                '^/api/(.*)$ http://localhost:4000/$1 [P]'])];
+        },
+    });
+    cb();
+}
+
+// 启动浏览器打开地址
+function distBrowser() {
+    return gulp
+        .src(__filename)
+        .pipe(open({ uri: 'http://localhost:38901/index.html' }));
+}
+//#endregion
 
 //开发相关的任务
 //1.监听sass的变化 自动编译sass
@@ -186,5 +214,6 @@ gulp.task('dev', gulp.series(devServer, openBrowser, function () {
 
 //default 任务
 //第一个参数 任务的名字 第二个参数具体要执行的任务
-gulp.task('default', gulp.series(cleanDist, gulp.parallel(js, stylePro, imgMin), revjs, copy, html));
+gulp.task('default', gulp.series(cleanDist, gulp.parallel(js, stylePro, imgMin), revjs, copy, html, distServer, openBrowserDist));
+
 

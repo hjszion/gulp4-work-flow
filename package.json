@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start":"cross-env xx==444 gulp"
   },
   "keywords": [],
   "author": "",
@@ -14,6 +15,7 @@
     "@babel/preset-env": "^7.6.0",
     "autoprefixer": "^9.6.1",
     "connect-modrewrite": "^0.10.2",
+    "cross-env": "^6.0.0",
     "eslint": "^6.4.0",
     "gulp": "^4.0.2",
     "gulp-babel": "^8.0.0",
