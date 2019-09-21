@@ -1,0 +1,5 @@
+.box {
+  width: 30px;
+  height: red;
+  background-color: red;
+  display: flex; }

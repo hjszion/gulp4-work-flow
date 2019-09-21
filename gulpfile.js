@@ -1,5 +1,6 @@
 const gulp = require('gulp');
 const sass = require('gulp-sass');
+const concat = require('gulp-concat');
 
 //3.9.1版本
 //第一个参数 任务的名字 第二个参数具体要执行的任务
@@ -18,11 +19,16 @@ gulp.task(html);
 
 //可以指定当前任务(函数任务)的名字
 //1.sass进行样式的预处理 (sass => css)
-//2.代码进行合并
+//2.代码进行合并 排除掉已经合并的main.css文件 不然会给main.css重复添加内容
+//3.sourcemap处理
+//4.给css3的样式打上自动的前缀 autoprefixer
+//5.压缩css
+//6.给main.css文件打上版本号
 function style(){
-    return gulp.src(['./src/style/**/*.{scss,css}'])
-    .pipe(sass().on('error', sass.logError))    
-    .pipe(gulp.dest('./src/style/'));
+    return gulp.src(['./src/style/**/*.{scss,css}', '!./src/style/main.css'])
+    .pipe(sass().on('error', sass.logError)) 
+    .pipe(concat('main.css')) 
+    .pipe(gulp.dest('./src/style/')); 
 }
 style.displayName = 'style:pro';   //可以指定非函数名字的任务名
 gulp.task(style);
@@ -51,10 +57,6 @@ function copy(){
 }
 gulp.task(copy);  //执行这个任务 拷贝就成功了
 //#endregion 
-
-
-
-
 
 
 
