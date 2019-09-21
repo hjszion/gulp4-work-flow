@@ -29,5 +29,8 @@
     "gulp-uglify": "^3.0.2",
     "htmlmin": "0.0.7",
     "node-sass": "^4.12.0"
+  },
+  "dependencies": {
+    "core-js": "^2.6.9"
   }
 }
