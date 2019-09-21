@@ -12,6 +12,9 @@ const imagemin = require('gulp-imagemin');
 const eslint = require('gulp-eslint');
 const babel = require('gulp-babel');
 const uglify = require('gulp-uglify');
+const connect = require('gulp-connect');
+const modRewrite = require('connect-modrewrite');
+const open = require('gulp-open');
 
 //gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字 
 function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成
@@ -77,7 +80,7 @@ function stylePro() {
 }
 //清理指定目录下的所有.css文件和.html文件
 function cleanDist() {
-    return gulp.src(['dist/**/*.*'], { read: false, allowEmpty:true })
+    return gulp.src(['dist/**/*.*'], { read: false, allowEmpty: true })
         .pipe(clean());
 }
 //#endregion
@@ -135,15 +138,37 @@ function js() {
         .pipe(gulp.dest('./src/js/'));
 }
 
+//使用gulp-connect配置服务器
+// 配置测试服务器
+function devServer(cb) {
+    connect.server({
+        root: ['./src'], // 网站根目录
+        port: 38900, // 端口
+        livereload: true,
+        middleware: function (connect, opt) {
+            return [modRewrite([// 设置代理
+                '^/api/(.*)$ http://localhost:4000/$1 [P]'])];
+        },
+    });
+    cb();
+}
+
+// 启动浏览器打开地址
+function openBrowser() {
+    return gulp
+        .src(__filename)
+        .pipe(open({ uri: 'http://localhost:38900/index.html' }));
+}
+
 //开发相关的任务
 //1.监听sass的变化 自动编译sass
 //2.自动执行打开浏览器 启动server
 //3.监听js的变化
 
 //dev 任务
-gulp.task('dev', function () {
+gulp.task('dev', gulp.series(devServer, openBrowser, function () {
     gulp.watch(['./src/style/scss/**/*.scss', './src/style/css/**/*.css'], gulp.series(style))
-});
+}));
 
 //default 任务
 //第一个参数 任务的名字 第二个参数具体要执行的任务
