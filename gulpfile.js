@@ -11,12 +11,13 @@ const htmlmin = require('gulp-htmlmin');
 const imagemin = require('gulp-imagemin');
 const eslint = require('gulp-eslint');
 const babel = require('gulp-babel');
+const uglify = require('gulp-uglify');
 
 //gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字 
 function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成
     //把src目录下的html都复制到dist目录下 并且替换css版本 js版本也得替换
     //最后 html 进行压缩
-    return gulp.src(['./src/index.html', './src/view/**/*.html', './src/style/rev-manifest.json'], { base: './src/' })
+    return gulp.src(['./src/index.html', './src/view/**/*.html', './src/style/rev-manifest.json', './src/js/rev-manifest.json'], { base: './src/' })
         .pipe(revCollector({ replaceReved: true }))   //对这些文件进行打版本
         .pipe(htmlmin({
             removeComments: true, // 清除HTML注释
@@ -76,7 +77,7 @@ function stylePro() {
 }
 //清理指定目录下的所有.css文件和.html文件
 function cleanDist() {
-    return gulp.src(['./dist/style/*.css', './dist/**/*.html'], { read: false })
+    return gulp.src(['./dist/style/*.css', './dist/**/*.html', './dist/js/**/*.js'], { read: false })
         .pipe(clean());
 }
 //#endregion
@@ -127,7 +128,11 @@ function js() {
         .pipe(eslint.format())
         .pipe(eslint.failAfterError())
         .pipe(babel())  //配置内容都放到了 .babelrc文件里面了
-        .pipe(gulp.dest('./dist/js/'));
+        .pipe(uglify())  //压缩代码
+        .pipe(rev())  //给js打版本
+        .pipe(gulp.dest('./dist/js/'))
+        .pipe(rev.manifest())
+        .pipe(gulp.dest('./src/js/'));
 }
 
 //开发相关的任务
@@ -142,5 +147,5 @@ gulp.task('dev', function () {
 
 //default 任务
 //第一个参数 任务的名字 第二个参数具体要执行的任务
-gulp.task('default', gulp.series(js));
+gulp.task('default', gulp.series(cleanDist, js));
 
