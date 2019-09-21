@@ -10,6 +10,7 @@ const clean = require('gulp-clean');
 const htmlmin = require('gulp-htmlmin');
 const imagemin = require('gulp-imagemin');
 const eslint = require('gulp-eslint');
+const babel = require('gulp-babel');
 
 //gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字 
 function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成
@@ -124,7 +125,9 @@ function js() {
             console.log(`JSfailNumber: ${results.errorCount}`);
         }))
         .pipe(eslint.format())
-        .pipe(eslint.failAfterError());
+        .pipe(eslint.failAfterError())
+        .pipe(babel())  //配置内容都放到了 .babelrc文件里面了
+        .pipe(gulp.dest('./dist/js/'));
 }
 
 //开发相关的任务
