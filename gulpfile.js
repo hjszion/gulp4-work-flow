@@ -77,7 +77,7 @@ function stylePro() {
 }
 //清理指定目录下的所有.css文件和.html文件
 function cleanDist() {
-    return gulp.src(['./dist/style/*.css', './dist/**/*.html', './dist/js/**/*.js'], { read: false })
+    return gulp.src(['dist/**/*.*'], { read: false, allowEmpty:true })
         .pipe(clean());
 }
 //#endregion
@@ -93,7 +93,7 @@ function copy() {
     //task 方法 接收一个cb回调函数 在任务结束的时候执行下cb回调函数
     //方法:可以返回一个流
     //方法:返回一个promise也是可以  /** 代表任何子目录 /*.*代表任何文件下的任何后缀名文件
-    return gulp.src(['src/lib/**/*.*'], { base: 'src/' })  //node 一个src流   base:'src/' 以src为基准目录 然后pipe对应了dist/
+    return gulp.src(['src/lib/**/*.*', 'src/assets/**/*.*'], { base: 'src/' })  //node 一个src流   base:'src/' 以src为基准目录 然后pipe对应了dist/
         .pipe(gulp.dest('dist/'))   //pipe到另一个文件夹下 gulp.dest:把所有文件保存到xxx地方   
 }
 //#endregion
@@ -129,9 +129,9 @@ function js() {
         .pipe(eslint.failAfterError())
         .pipe(babel())  //配置内容都放到了 .babelrc文件里面了
         .pipe(uglify())  //压缩代码
-        .pipe(rev())  //给js打版本
+        .pipe(rev())  //给js打版本 生成打版本文件
         .pipe(gulp.dest('./dist/js/'))
-        .pipe(rev.manifest())
+        .pipe(rev.manifest())   //使用版本映射关系生成具体json文件
         .pipe(gulp.dest('./src/js/'));
 }
 
@@ -147,5 +147,5 @@ gulp.task('dev', function () {
 
 //default 任务
 //第一个参数 任务的名字 第二个参数具体要执行的任务
-gulp.task('default', gulp.series(cleanDist, js));
+gulp.task('default', gulp.series(cleanDist, gulp.parallel(js, stylePro, imgMin), copy, html));
 
