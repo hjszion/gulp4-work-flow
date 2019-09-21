@@ -1,20 +1,18 @@
 requirejs.config({
     paths: {
-        jquery: '../../lib/jQuery-3.4-1.js'
+        jquery: '../../lib/jQuery-3.4-1.js',
+        api:'../service/api.js'
     }
 });
 
-requirejs(['jquery'], function($) {
+requirejs(['jquery', 'api'], function($, api) {
     $(function(){
         $('.box').click(function(){
             alert(2333);
         });
-        $.ajax({
-            url:'/api/userlist',
-            type:'GET',
-            success:function(data){
-                console.log(data);
-            }
-        });
     }); 
+});
+//控制器层调用服务器层获取数据
+api.getUserList(null, function(data){
+    console.log(data);
 });
