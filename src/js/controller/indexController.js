@@ -1,10 +1,20 @@
 requirejs.config({
-    baseUrl: 'js/lib',
     paths: {
-        jquery: '/js/controller/indexController'
+        jquery: '../../lib/jQuery-3.4-1.js'
     }
 });
 
 requirejs(['jquery'], function($) {
-    
+    $(function(){
+        $('.box').click(function(){
+            alert(2333);
+        });
+        $.ajax({
+            url:'/api/userlist',
+            type:'GET',
+            success:function(data){
+                console.log(data);
+            }
+        });
+    }); 
 });
