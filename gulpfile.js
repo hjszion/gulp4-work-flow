@@ -27,3 +27,31 @@ gulp.task(style);
 //注册一个任务 串行的顺序执行 html style:pro 
 gulp.task('htmlstyle', gulp.series('html', 'style:pro'));
 
+//注册一个任务 并行执行多个任务
+gulp.task('htmlstyle_para', gulp.parallel(html, 'style:pro'));  //传方法和传字符串都是一样的
+//各种任务执行的嵌套执行 任意多个 可以是方法名字 可以是任务名字
+gulp.task('htmlnest', gulp.series(
+    html,
+    gulp.parallel(html, 'style:pro'),
+    gulp.series('html', 'style:pro')
+));
+
+//gulp拷贝任务
+//实现从src/assets/ 下所有的文件都拷贝到dist/assets
+function copy(){
+    //task 方法 接收一个cb回调函数 在任务结束的时候执行下cb回调函数
+    //方法:可以返回一个流
+    //方法:返回一个promise也是可以  /** 代表任何子目录 /*.*代表任何文件下的任何后缀名文件
+    return gulp.src(['src/assets/**/*.*','src/lib/**/*.*'], {base:'src/'})  //node 一个src流   base:'src/' 以src为基准目录 然后pipe对应了dist/
+    .pipe(gulp.dest('dist/'))   //pipe到另一个文件夹下 gulp.dest:把所有文件保存到xxx地方   
+}
+gulp.task(copy);  //执行这个任务 拷贝就成功了
+
+
+
+
+
+
+
+
+
