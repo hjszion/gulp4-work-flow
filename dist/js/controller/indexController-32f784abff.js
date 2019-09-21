@@ -1,0 +1,1 @@
+"use strict";requirejs.config({paths:{jquery:"../../lib/jQuery-3.4-1.js",api:"../service/api.js"}}),requirejs(["jquery","api"],function(i,e){i(function(){i(".box").click(function(){alert(2333)})})}),api.getUserList(null,function(i){console.log(i)});
