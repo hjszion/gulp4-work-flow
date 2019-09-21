@@ -7,20 +7,18 @@ const cleanCss = require('gulp-clean-css');
 const rev = require('gulp-rev');
 const revCollector = require('gulp-rev-collector');
 const clean = require('gulp-clean');
-const htmlmin = require('gulp-htmlmin')
+const htmlmin = require('gulp-htmlmin');
+const imagemin = require('gulp-imagemin');
 
 //3.9.1版本
 //第一个参数 任务的名字 第二个参数具体要执行的任务
-gulp.task('default', function (cb) {
-    console.log('gulp is running...');
-    cb();
-});
+gulp.task('default', gulp.series(imgMin));
 
 //gulp4.0 注册一个任务的时候 直接可以把一个方法注册成一个任务名字 
 function html() {   //接收一个回调函数作为参数 此回调函数执行后 告诉gulp当前任务执行完成
     //把src目录下的html都复制到dist目录下 并且替换css版本 js版本也得替换
     //最后 html 进行压缩
-    return gulp.src(['./src/index.html', './src/view/**/*.html', './src/style/rev-manifest.json'], {base:'./src/'})
+    return gulp.src(['./src/index.html', './src/view/**/*.html', './src/style/rev-manifest.json'], { base: './src/' })
         .pipe(revCollector({ replaceReved: true }))   //对这些文件进行打版本
         .pipe(htmlmin({
             removeComments: true, // 清除HTML注释
@@ -96,17 +94,32 @@ function copy() {
     //task 方法 接收一个cb回调函数 在任务结束的时候执行下cb回调函数
     //方法:可以返回一个流
     //方法:返回一个promise也是可以  /** 代表任何子目录 /*.*代表任何文件下的任何后缀名文件
-    return gulp.src(['src/assets/**/*.*', 'src/lib/**/*.*'], { base: 'src/' })  //node 一个src流   base:'src/' 以src为基准目录 然后pipe对应了dist/
+    return gulp.src(['src/lib/**/*.*'], { base: 'src/' })  //node 一个src流   base:'src/' 以src为基准目录 然后pipe对应了dist/
         .pipe(gulp.dest('dist/'))   //pipe到另一个文件夹下 gulp.dest:把所有文件保存到xxx地方   
 }
 //#endregion
+
+//图片进行压缩处理
+function imgMin() {
+    return gulp.src(['./src/assets/**/*.{jpeg,png,jpg,gif,ico,svg}'], {base:'./src/assets/'})
+        .pipe(imagemin({
+            optimizationLevel: 5, // 类型：Number  默认：3  取值范围：0-7（优化等级）
+            progressive: true, // 类型：Boolean 默认：false 无损压缩jpg图片
+            interlaced: true,
+            // 类型：Boolean 默认：false 隔行扫描gif进行渲染
+            multipass: true // 类型：Boolean
+            // 默认：false 多次优化svg直到完全优化
+        }))
+        .pipe(gulp.dest('./dist/assets/'));
+}
 
 //开发相关的任务
 //1.监听sass的变化 自动编译sass
 //2.自动执行打开浏览器 启动server
 //3.监听其他文件的变化也是这种方法
-gulp.task('dev', function(){
+gulp.task('dev', function () {
     gulp.watch(['./src/style/scss/**/*.scss', './src/style/css/**/*.css'], gulp.series(style))
 })
+
 
 
